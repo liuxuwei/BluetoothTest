@@ -1,14 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/btnSetMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="设置模式" />
+
+    <Button
+        android:id="@+id/btnGetMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="获取模式" />
+
+    <Button
+        android:id="@+id/btnHearMakeup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="听力补偿" />
+
+    <Button
+        android:id="@+id/btnCompareCheck"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="对比校验" />
+
+    <Button
+        android:id="@+id/btnSetLanguage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="语言设置" />
+
+    <Button
+        android:id="@+id/btnRegisterCallback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="registerCallback" />
+
+    <Button
+        android:id="@+id/btnScan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="start scan" />
+
+    <Button
+        android:id="@+id/btnStopScan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="stop scan" />
 
     <ListView
         android:id="@+id/btListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
