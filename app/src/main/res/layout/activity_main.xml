@@ -38,6 +38,14 @@
         android:text="语言设置" />
 
     <Button
+        android:id="@+id/btnHearingTest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="听力测试"/>
+
+
+
+    <Button
         android:id="@+id/btnRegisterCallback"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

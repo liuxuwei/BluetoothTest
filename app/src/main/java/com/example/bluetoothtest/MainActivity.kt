@@ -16,6 +16,17 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.bluetoothtest.Consts.Companion.COMMAND_ID
+import com.example.bluetoothtest.Consts.Companion.DESCRIPTOR_UUID
+import com.example.bluetoothtest.Consts.Companion.OFFS_COMMAND_ID_H
+import com.example.bluetoothtest.Consts.Companion.OFFS_COMMAND_ID_L
+import com.example.bluetoothtest.Consts.Companion.OFFS_PAYLOAD
+import com.example.bluetoothtest.Consts.Companion.OFFS_VENDOR_ID_H
+import com.example.bluetoothtest.Consts.Companion.OFFS_VENDOR_ID_L
+import com.example.bluetoothtest.Consts.Companion.REQUEST_COARCH_LOCATION
+import com.example.bluetoothtest.Consts.Companion.RESPONSE_ID
+import com.example.bluetoothtest.Consts.Companion.SCAN_PERIOD
+import com.example.bluetoothtest.Consts.Companion.SERVICE_ID
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
@@ -31,48 +42,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var btList = arrayListOf<BluetoothDevice>()
     private var mScanning = false
 
-    private val GATT_UUID = "-0000-1000-8000-00805f9b34fb"
-
-    private val CSR_UUID = "-D102-11E1-9B23-00025B00A5A5"
-
-    private val DESCRIPTOR_UUID = "00002902$GATT_UUID"
-
-    private val SERVICE_ID = "00001100$CSR_UUID"
-
-    private val COMMAND_ID = "00001101$CSR_UUID"
-
-    private val RESPONSE_ID = "00001102$CSR_UUID"
-
-    private val DATA_ID = "00001103$CSR_UUID"
-
     private var isCanScan = false
-
-    val SOF = 0xFF.toByte()
 
     var bluetoothGatt: BluetoothGatt? = null
 
-
-    companion object {
-        const val REQUEST_ENABLE_BT = 1
-        const val REQUEST_COARCH_LOCATION = 3
-        const val SCAN_PERIOD: Long = 5000
-        const val OFFS_SOF = 0
-        const val OFFS_VERSION = 1
-        const val OFFS_FLAGS = 2
-        const val OFFS_PAYLOAD_LENGTH = 3
-        const val OFFS_VENDOR_ID = 4
-        const val OFFS_VENDOR_ID_H = OFFS_VENDOR_ID
-        const val OFFS_VENDOR_ID_L = OFFS_VENDOR_ID + 1
-        const val OFFS_COMMAND_ID = 6
-        const val OFFS_COMMAND_ID_H = OFFS_COMMAND_ID
-        const val OFFS_COMMAND_ID_L = OFFS_COMMAND_ID + 1
-        const val OFFS_PAYLOAD = 8
-        const val PROTOCOL_VERSION = 1.toByte()
-    }
-
-
     private val handler = Handler()
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,11 +103,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         var byteArr = byteArrayOf(0x01, 0x42)
 
         when (currentCommand) {
-            "setMode" -> byteArr = if (isComfortListen) byteArrayOf(0x10,0x10) else byteArrayOf(0x10,0x11)
+            "setMode" -> byteArr = byteArrayOf(0x01,0x01,0x00)
             "getMode" -> byteArr = byteArrayOf(0x01,0x00)
-            "hearMakeUp" -> byteArr = byteArrayOf(0x01, 0x10)
-            "compareCheck" -> byteArr = byteArrayOf(0x01, 0x40)
-            "setLanguage" -> byteArr = byteArrayOf(0x01, 0x42)
+            "hearMakeUp" -> byteArr = byteArrayOf(0x01, 0x10, 0x00)
+            "compareCheck" -> byteArr = byteArrayOf(0x01, 0x40,0x10)
+            "setLanguage" -> byteArr = byteArrayOf(0x01, 0x42, 0x00)
+            "hearingTest" -> byteArr = byteArrayOf(0x01, 0x11, 0x01, 0x00, 0x3e, 0x08, -0x00, 0x00, 0x08, 0x34)
         }
 
 
@@ -145,6 +120,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         gattCharacteristic.value = myFrame
 
         gattCharacteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+
+        bluetoothGatt!!.setCharacteristicNotification(gattCharacteristic, true)
 
         return bluetoothGatt!!.writeCharacteristic(gattCharacteristic)
     }
@@ -191,10 +168,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val packet_length = payload_length + OFFS_PAYLOAD
         val data = ByteArray(packet_length)
 
-        data[OFFS_SOF] = SOF
-        data[OFFS_VERSION] = PROTOCOL_VERSION
-        data[OFFS_FLAGS] = flags
-        data[OFFS_PAYLOAD_LENGTH] = payload_length.toByte()
+//        data[OFFS_SOF] = SOF
+//        data[OFFS_VERSION] = PROTOCOL_VERSION
+//        data[OFFS_FLAGS] = flags
+//        data[OFFS_PAYLOAD_LENGTH] = payload_length.toByte()
         data[OFFS_VENDOR_ID_H] = 0x00
         data[OFFS_VENDOR_ID_L] = 0x0a
         data[OFFS_COMMAND_ID_H] = 0x02
@@ -202,9 +179,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         for (idx in 0 until payload_length)
             data[idx + OFFS_PAYLOAD] = payload[idx]
-
-
-
 
 
         return data
@@ -283,6 +257,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         btnScan.setOnClickListener(this)
         btnStopScan.setOnClickListener(this)
         btnRegisterCallback.setOnClickListener(this)
+        btnHearingTest.setOnClickListener(this)
 
 
         btListView.onItemClickListener =
@@ -458,7 +433,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     Log.e(TAG, "${characteristic.uuid}的属性为:  有通知");
                 }
 
-
             }
         }
     }
@@ -484,6 +458,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 bluetoothAdapter?.cancelDiscovery()
             }
             R.id.btnRegisterCallback -> receiveCallback()
+            R.id.btnHearingTest -> currentCommand = "hearingTest"
         }
         Thread(SendDataRunnable()).start()
     }
@@ -529,14 +504,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun checkIfOpenBlueTooth() {
         if (bluetoothAdapter?.isEnabled == false) {
             val enableBluetoothIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BT)
+            startActivityForResult(enableBluetoothIntent, Consts.REQUEST_ENABLE_BT)
         }
     }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_ENABLE_BT) {
+        if (requestCode == Consts.REQUEST_ENABLE_BT) {
             when (resultCode) {
                 Activity.RESULT_OK -> {
                     Log.d(TAG, "enable bt success")

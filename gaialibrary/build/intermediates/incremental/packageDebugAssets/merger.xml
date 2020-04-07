@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="/Users/mm/AndroidStudioProject/gaiacontrol_3_4_0_52/gaialibrary/src/main/assets"/><source path="/Users/mm/AndroidStudioProject/gaiacontrol_3_4_0_52/gaialibrary/build/generated/assets/shaders/debug"/></dataSet><dataSet config="debug"><source path="/Users/mm/AndroidStudioProject/gaiacontrol_3_4_0_52/gaialibrary/src/debug/assets"/></dataSet></merger>
